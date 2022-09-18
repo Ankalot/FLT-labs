@@ -1,0 +1,7 @@
+lexicographic
+constructors = f(2),s(1),z(1)
+variables = x, y
+3
+f(s(x),s(y)) = f(x,f(s(x),y))
+f(s(x),z(y)) = f(x,s(z(y)))
+f(z(y),x) = s(x)

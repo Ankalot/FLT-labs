@@ -1,0 +1,1 @@
+lua 1.lua < test1.txt

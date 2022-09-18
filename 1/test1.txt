@@ -1,0 +1,8 @@
+lexicographic
+constructors = a(2),o(2),n(1)
+variables = x, y, z
+4
+a(x,o(y,z)) = o(a(x,z),o(y,z))
+n(a(x,y)) = o(n(x),n(y))
+n(o(x,y)) = a(n(x),n(y))
+n(n(x)) = x
