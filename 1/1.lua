@@ -67,9 +67,18 @@ function findConstr(name, constructors)
   end
 end
 
-function moveConstr(c1parGr, c1index, c1, c2Gr)
+function tieConstr(c1parGr, c1index, c1, c2Gr, wasInConstrList)
   table.insert(c2Gr, 1, c1)
+  if wasInConstrList then
+    table.remove(c1parGr, c1index)
+  end
+end
+
+function untieConstr(c1parGr, c1index, c1, c2Gr, wasInConstrList)
   table.remove(c1parGr, c1index)
+  if wasInConstrList then
+    table.insert(c2Gr, c1)
+  end
 end
 
 function law3(term1, term2, constructors)
@@ -84,12 +93,12 @@ function law3(term1, term2, constructors)
   local movedConstr = false
   if not (constr1 > constr2) then
     movedConstr = true
-    moveConstr(c1parGr, c1index, constr1, constr2.greater)
+    tieConstr(c1parGr, c1index, constr1, constr2.greater, c1parGr == constructors)
   end
   for _, arg in ipairs(term2.args) do
     if not knuthBendix(term1, arg, constructors) then
       if movedConstr then
-        moveConstr(constr2.greater, 1, constr1, c1parGr)
+        untieConstr(constr2.greater, 1, constr1, c1parGr, c1parGr == constructors)
       end
       constructors = constrCopy
       return false
