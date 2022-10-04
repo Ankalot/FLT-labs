@@ -1,0 +1,1 @@
+lua main.lua < tests/test1.txt
