@@ -180,27 +180,52 @@ function algorithm(initState, finalStates, intermediateStates, letters)
     return eqClasses, rules
 end
 
-function removePrevState(state, prevName, letter)
-    for i, prev in ipairs(state.prev) do
-        if prev.state.name == prevName and prev.letter == letter then
-            table.remove(state.prev, i)
-            return
-        end 
+function isUnreachableIterate(initState, state, prevStates)
+    if state == initState then
+        return false
     end
-end
-
-function removeUnreachable(states)
-    local removed = false
-    for name, state in pairs(states) do
-        if #state.prev == 0 then
-            for letter, next in pairs(state.next) do
-                removePrevState(next, state.name, letter) 
-            end
-            states[name] = nil
-            removed = true
+    prevStates[state.name] = state
+    for _, prev in ipairs(state.prev) do
+        local prevState = prev.state
+        if not prevStates[prevState.name] and 
+           not isUnreachableIterate(initState, prevState, prevStates) then
+            return false
         end
     end
-    return removed
+    return true
+end
+
+function isUnreachable(initState, state)
+    local prevStates = { }
+    prevStates[state.name] = state
+    for _, prev in ipairs(state.prev) do
+        local prevState = prev.state
+        if not prevStates[prevState.name] and
+           not isUnreachableIterate(initState, prevState, prevStates) then
+            return false, nil
+        end
+    end
+    return true, prevStates
+end
+
+function removeUnreachable(initState, intermediateStates, finalStates)
+    for _, state in pairs(finalStates) do
+        if state ~= initState then
+            local isUnreachableBool, prevStates = isUnreachable(initState, state)
+            if isUnreachableBool then
+                for name, stateToRemove in pairs(prevStates) do
+                    for _, prev in ipairs(stateToRemove.prev) do
+                        prev.state.next[prev.letter] = nil
+                    end
+                    if intermediateStates[name] then
+                        intermediateStates[name] = nil
+                    else
+                        finalStates[name] = nil
+                    end
+                end
+            end
+        end
+    end
 end
 
 function length(tbl)
@@ -211,22 +236,42 @@ function length(tbl)
     return len
 end
 
-function isTrap(state)
+function isTrapIterate(state, reachableStates)
+    if state.isFinal then
+        return false
+    end
+    reachableStates[state.name] = state
     for _, nextState in pairs(state.next) do
-        if nextState ~= state then
+        if not reachableStates[nextState.name] and 
+           not isTrapIterate(nextState, reachableStates) then
             return false
         end
     end
     return true
 end
 
-function removeTraps(states)
-    for name, state in pairs(states) do
-        if isTrap(state) then
-            for _, prev in pairs(state.prev) do
-                prev.state.next[prev.letter] = nil
+function isTrap(state)
+    local reachableStates = { }
+    reachableStates[state.name] = state
+    for _, nextState in pairs(state.next) do
+        if not reachableStates[nextState.name] and
+           not isTrapIterate(nextState, reachableStates) then
+            return false, nil
+        end
+    end
+    return true, reachableStates
+end
+
+function removeTraps(intermediateStates)
+    for _, state in pairs(intermediateStates) do
+        local isTrapBool, reachableStates = isTrap(state)
+        if isTrapBool then
+            for name, stateToRemove in pairs(reachableStates) do
+                for _, prev in ipairs(stateToRemove.prev) do
+                    prev.state.next[prev.letter] = nil
+                end
+                intermediateStates[name] = nil
             end
-            states[name] = nil
         end
     end
 end
@@ -330,8 +375,7 @@ end
 function main()
     local initState, finalStates, intermediateStates, letters = input()
     removeTraps(intermediateStates)
-    while removeUnreachable(finalStates) do end
-    while removeUnreachable(intermediateStates) do end
+    removeUnreachable(initState, intermediateStates, finalStates)
     local eqClasses, rules = algorithm(initState, finalStates, intermediateStates, letters)
     outputEqClassesAndRules(eqClasses, rules)
     outputEqClassesInLang(eqClasses, initState)
