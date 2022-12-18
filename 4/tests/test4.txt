@@ -1,0 +1,12 @@
+[S] -> [S][Oper][S]
+[S] -> t[DelimA][T]
+[Oper] -> a
+[Oper] -> [OperC]o[OperC]
+[OperC] -> c
+[DelimA] -> l
+[DelimB] -> r
+[T] -> [S][DelimB]
+[T] -> [T][Iter]
+[Iter] -> s
+[T] -> t
+tltcoctltltrs

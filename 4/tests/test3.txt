@@ -1,0 +1,4 @@
+[S] -> [SS]
+[SS] -> [SS]t[SS] | [TT]a
+[TT] -> [TT]x[SS] | b
+batbxbaa

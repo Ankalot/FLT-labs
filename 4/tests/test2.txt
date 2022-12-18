@@ -1,0 +1,7 @@
+[S] -> [I]a
+[P] -> [P]b
+[P] -> z
+[I] -> z[S]
+[I] -> c
+[I] -> [I]b[P]
+zcabzbbzba

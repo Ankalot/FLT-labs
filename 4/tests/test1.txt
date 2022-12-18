@@ -1,0 +1,4 @@
+[S] -> [A]a[S] | [S]b[S] | ab | [S][B]a
+[A] -> [A]b | c | [B][B]
+[B] -> b | d | ab
+dabaabbab
