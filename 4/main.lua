@@ -240,14 +240,18 @@ function outputParseTree(parseTree, spaces)
 end
 
 function ntermHasFiniteLangStep(rules, visitedNterms, nterm)
+    local newVisitedNterms = {}
     for _, rule in ipairs(rules[nterm]) do
         for _, smth in ipairs(rule) do
             if type(smth) == "table" then
                 local ruleNterm = smth[1]
                 if visitedNterms[ruleNterm] then
-                    return false
+                    if not newVisitedNterms[ruleNterm] then
+                        return false
+                    end
                 else
                     visitedNterms[ruleNterm] = true
+                    newVisitedNterms[ruleNterm] = true
                     if not ntermHasFiniteLangStep(rules, visitedNterms, ruleNterm) then
                         return false
                     end
